@@ -9,6 +9,7 @@ export default function RootLayout() {
     "sans-medium: required": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
     "sans-semibold: required": require("../../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
     "sans-bold: required": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
+    "sans-extrabold: required": require("../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
   });
 
   useEffect(() => {
