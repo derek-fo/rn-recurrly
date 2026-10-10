@@ -5,6 +5,7 @@ import { styled } from "nativewind";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import {
   HOME_BALANCE,
+  HOME_SUBSCRIPTIONS,
   HOME_USER,
   UPCOMING_SUBSCRIPTIONS,
 } from "../../../constants/data";
@@ -14,13 +15,27 @@ import { formatCurrency } from "../../../lib/utils";
 import dayjs from "dayjs";
 import ListHeading from "../../../components/ListHeading";
 import UpcomingSubscription from "../../../components/UpcomingSubscription";
+import SubscriptionCard from "../../../components/SubscriptionCard";
+import { useState } from "react";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
 export default function App() {
+  const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
+    string | null
+  >(null);
+
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
-      <View className="home-header">
+
+
+      <View>
+        <ListHeading title="All Subscriptions" />
+
+        <FlatList
+        ListHeaderComponent={() => (
+          <>
+                <View className="home-header">
         <View className="home-user">
           <Image source={images.avatar} className="home-avatar" />
           <Text className="home-user-name">{HOME_USER.name}</Text>
@@ -47,13 +62,34 @@ export default function App() {
 
         <FlatList
           data={UPCOMING_SUBSCRIPTIONS}
-          keyExtractor={(item) => item.id}
           renderItem={({ item }) => <UpcomingSubscription {...item} />}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
         />
       </View>
-
-      <View>
-        <ListHeading title="All Subscriptions" />
+          </>
+        )}  
+          data={HOME_SUBSCRIPTIONS}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <SubscriptionCard
+              {...item}
+              expanded={expandedSubscriptionId === item.id}
+              onPress={() =>
+                setExpandedSubscriptionId((currentId) =>
+                  currentId === item.id ? null : item.id,
+                )
+              }
+            />
+          )}
+          extraData={expandedSubscriptionId}
+          ItemSeparatorComponent={() => <View className="h-4" />}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text className="text-gray-500">No subscriptions found.</Text>
+          }
+        />
       </View>
     </SafeAreaView>
   );
