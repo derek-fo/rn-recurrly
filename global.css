@@ -298,6 +298,50 @@
         @apply border-destructive;
     }
 
+    .auth-input-row {
+        @apply flex-row items-center rounded-2xl border border-border bg-background;
+    }
+
+    .auth-input-focused {
+        @apply border-accent;
+    }
+
+    .auth-input-bare {
+        @apply flex-1 px-4 py-4 text-base font-sans-medium text-primary;
+    }
+
+    .auth-input-toggle {
+        @apply px-4 py-3;
+    }
+
+    .auth-input-toggle-text {
+        @apply text-sm font-sans-semibold text-accent;
+    }
+
+    .auth-code-input {
+        @apply text-center text-2xl font-sans-bold tracking-[8px];
+    }
+
+    .auth-banner {
+        @apply rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3;
+    }
+
+    .auth-banner-text {
+        @apply text-sm font-sans-medium text-destructive;
+    }
+
+    .auth-email-highlight {
+        @apply font-sans-bold text-primary;
+    }
+
+    .auth-resend-row {
+        @apply flex-row items-center justify-center gap-1;
+    }
+
+    .auth-link-disabled {
+        @apply text-muted-foreground;
+    }
+
     .auth-error {
         @apply text-xs font-sans-medium text-destructive;
     }

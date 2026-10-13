@@ -50,6 +50,40 @@ declare global {
     interface ListHeadingProps {
         title: string;
     }
+
+    interface AuthScreenProps {
+        title: string;
+        subtitle: React.ReactNode;
+        children: React.ReactNode;
+    }
+
+    interface AuthFieldProps extends React.ComponentProps<typeof import("react-native").TextInput> {
+        label: string;
+        error?: string;
+        hint?: string;
+        secureToggle?: boolean;
+        ref?: React.Ref<import("react-native").TextInput>;
+    }
+
+    interface AuthButtonProps {
+        title: string;
+        onPress: () => void;
+        loading?: boolean;
+        disabled?: boolean;
+    }
+
+    interface AuthCodeStepProps {
+        email: string;
+        code: string;
+        onChangeCode: (code: string) => void;
+        error?: string;
+        loading: boolean;
+        onSubmit: () => void;
+        onResend: () => Promise<boolean>;
+        onBack: () => void;
+        submitLabel: string;
+        backLabel: string;
+    }
 }
 
 export {};

@@ -1,5 +1,5 @@
-import { SplashScreen, Stack } from "expo-router";
+import { Stack } from "expo-router";
 
-export default function RootLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+export default function AuthLayout() {
+  return <Stack screenOptions={{ headerShown: false, animation: "fade" }} />;
 }
