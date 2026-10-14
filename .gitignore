@@ -3,6 +3,11 @@
 # dependencies
 node_modules/
 
+# environment variables (never commit real keys; .env.example holds placeholders only)
+.env
+.env.*
+!.env.example
+
 # Expo
 .expo/
 dist/
