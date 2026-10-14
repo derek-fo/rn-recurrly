@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import { type Href, useRouter } from "expo-router";
 
 type FinalizeNavigateParams = {
@@ -21,7 +22,8 @@ export const useAuthRedirect = (onPendingTask: () => void) => {
     }
 
     const url = decorateUrl("/");
-    if (url.startsWith("http")) {
+    // Absolute URLs only occur on web; native always gets an in-app route.
+    if (Platform.OS === "web" && url.startsWith("http")) {
       window.location.href = url;
     } else {
       router.replace(url as Href);

@@ -12,12 +12,16 @@ const Settings = () => {
   const { signOut } = useClerk();
   const { user } = useUser();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string>();
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
+    setSignOutError(undefined);
     try {
       // The root layout's protected routes send the user back to sign-in.
       await signOut();
+    } catch {
+      setSignOutError("Couldn't sign you out. Check your connection and try again.");
     } finally {
       setIsSigningOut(false);
     }
@@ -51,6 +55,8 @@ const Settings = () => {
             <Text className="sub-cancel-text">Sign out</Text>
           )}
         </Pressable>
+
+        {signOutError && <Text className="auth-error mt-3 text-center">{signOutError}</Text>}
       </View>
     </SafeAreaView>
   );
