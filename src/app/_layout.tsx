@@ -1,12 +1,14 @@
 import { SplashScreen, Stack } from "expo-router";
 import "../../global.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
 import { useFonts } from "expo-font";
-import { ClerkProvider, useAuth } from "@clerk/expo";
+import { ClerkProvider, useAuth, useUser } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { resourceCache } from "@clerk/expo/resource-cache";
+import { PostHogProvider } from "posthog-react-native";
 import { colors } from "../../constants/theme";
+import { posthog } from "../lib/posthog";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,8 +40,33 @@ const ConnectingScreen = () => (
 
 const RootNavigator = ({ fontsReady }: { fontsReady: boolean }) => {
   const { isLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
+  const previousSignedIn = useRef<boolean | null>(null);
+  const identifiedUserId = useRef<string | undefined>(undefined);
   const [authTimedOut, setAuthTimedOut] = useState(false);
   const isReady = fontsReady && isLoaded;
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (previousSignedIn.current && !isSignedIn) {
+      posthog?.reset();
+      identifiedUserId.current = undefined;
+    }
+
+    if (isSignedIn && user?.id && identifiedUserId.current !== user.id) {
+      posthog?.identify(user.id, {
+        $set: {
+          email: user.primaryEmailAddress?.emailAddress,
+          first_name: user.firstName,
+          last_name: user.lastName,
+        },
+      });
+      identifiedUserId.current = user.id;
+    }
+
+    previousSignedIn.current = !!isSignedIn;
+  }, [isLoaded, isSignedIn, user]);
 
   useEffect(() => {
     if (!fontsReady || isLoaded) return;
@@ -90,7 +117,13 @@ export default function RootLayout() {
       tokenCache={tokenCache}
       __experimental_resourceCache={nativeResourceCache}
     >
-      <RootNavigator fontsReady={fontsReady} />
+      {posthog ? (
+        <PostHogProvider client={posthog}>
+          <RootNavigator fontsReady={fontsReady} />
+        </PostHogProvider>
+      ) : (
+        <RootNavigator fontsReady={fontsReady} />
+      )}
     </ClerkProvider>
   );
 }

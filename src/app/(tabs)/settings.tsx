@@ -5,6 +5,8 @@ import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { useClerk, useUser } from "@clerk/expo";
 import clsx from "clsx";
 import { colors } from "../../../constants/theme";
+import { posthog } from "../../lib/posthog";
+import { posthogLogs } from "../../lib/posthog-logs";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -20,7 +22,10 @@ const Settings = () => {
     try {
       // The root layout's protected routes send the user back to sign-in.
       await signOut();
+      posthog?.capture("user_signed_out");
+      posthogLogs.signOutCompleted();
     } catch {
+      posthogLogs.signOutFailed();
       setSignOutError("Couldn't sign you out. Check your connection and try again.");
     } finally {
       setIsSigningOut(false);

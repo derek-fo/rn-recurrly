@@ -18,6 +18,8 @@ import UpcomingSubscription from "../../../components/UpcomingSubscription";
 import SubscriptionCard from "../../../components/SubscriptionCard";
 import { useState } from "react";
 import { useUser } from "@clerk/expo";
+import { posthog } from "../../lib/posthog";
+import { posthogLogs } from "../../lib/posthog-logs";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -79,11 +81,27 @@ export default function App() {
           <SubscriptionCard
             {...item}
             expanded={expandedSubscriptionId === item.id}
-            onPress={() =>
+            onPress={() => {
+              const isExpanding = expandedSubscriptionId !== item.id;
               setExpandedSubscriptionId((currentId) =>
                 currentId === item.id ? null : item.id,
-              )
-            }
+              );
+
+              if (isExpanding) {
+                posthog?.capture("subscription_details_expanded", {
+                  subscription_id: item.id,
+                  subscription_category: item.category,
+                  subscription_status: item.status,
+                  billing_interval: item.billing,
+                });
+                posthogLogs.subscriptionDetailsExpanded({
+                  id: item.id,
+                  category: item.category,
+                  status: item.status,
+                  billingInterval: item.billing,
+                });
+              }
+            }}
           />
         )}
         extraData={expandedSubscriptionId}
