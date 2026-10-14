@@ -24,6 +24,7 @@ declare global {
         price: number;
         currency?: string;
         billing: string;
+        frequency?: "Monthly" | "Yearly";
         renewalDate?: string;
         color?: string;
     }
@@ -33,6 +34,21 @@ declare global {
         onPress: () => void;
         onCancelPress?: () => void;
         isCancelling?: boolean;
+    }
+
+    interface CreateSubscriptionModalProps {
+        visible: boolean;
+        onClose: () => void;
+        onCreate: (subscription: Subscription) => void;
+    }
+
+    interface SubscriptionIconProps {
+        source: ImageSourcePropType;
+    }
+
+    interface SubscriptionsContextValue {
+        subscriptions: Subscription[];
+        addSubscription: (subscription: Subscription) => void;
     }
 
     interface UpcomingSubscription {

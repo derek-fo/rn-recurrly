@@ -1,15 +1,24 @@
 import dayjs from "dayjs";
 
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  BRL: "R$",
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+};
+
+// Built manually because Hermes ignores `currencyDisplay: "narrowSymbol"`
+// and renders USD as "US$" in the pt-BR locale.
 export const formatCurrency = (value: number, currency = "BRL"): string => {
+  const symbol = CURRENCY_SYMBOLS[currency] ?? currency;
   try {
-    return new Intl.NumberFormat("pt-br", {
-      style: "currency",
-      currency,
+    const amount = new Intl.NumberFormat("pt-br", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value);
+    return `${symbol}${amount}`;
   } catch {
-    return value.toFixed(2);
+    return `${symbol}${value.toFixed(2)}`;
   }
 };
 

@@ -162,6 +162,10 @@
         @apply size-16 rounded-lg;
     }
 
+    .sub-icon-remote {
+        @apply bg-white p-2;
+    }
+
     .sub-copy {
         @apply min-w-0 flex-1;
     }
@@ -395,7 +399,7 @@
     }
 
     .modal-overlay {
-        @apply flex-1 bg-black/50;
+        @apply flex-1;
     }
 
     .modal-container {
@@ -460,5 +464,37 @@
 
     .category-chip-text-active {
         @apply text-accent;
+    }
+
+    .subs-title {
+        @apply mb-5 text-3xl font-sans-bold text-primary;
+    }
+
+    .subs-search {
+        @apply mb-5 flex-row items-center rounded-2xl border border-border bg-card px-4;
+    }
+
+    .subs-search-focused {
+        @apply border-accent;
+    }
+
+    .subs-search-input {
+        @apply flex-1 py-4 text-base font-sans-medium text-primary;
+    }
+
+    .subs-search-clear {
+        @apply pl-3 py-2;
+    }
+
+    .subs-search-clear-text {
+        @apply text-sm font-sans-semibold text-accent;
+    }
+
+    .subs-empty {
+        @apply mt-10 items-center;
+    }
+
+    .subs-empty-text {
+        @apply text-base font-sans-medium text-muted-foreground;
     }
 }
