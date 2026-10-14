@@ -1,10 +1,9 @@
 import { View, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Redirect, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import { colors, components } from "../../../constants/theme";
 import { tabs } from "../../../constants/data";
 import clsx from "clsx";
-import { useAuth } from "@clerk/expo";
 
 const tabBar = components.tabBar;
 
@@ -19,17 +18,9 @@ const TabIcon = ({ focused, icon }: TabIconProps) => {
 };
 
 const TabLayout = () => {
-  const { isSignedIn, isLoaded } = useAuth();
+  // Access is enforced by Stack.Protected in the root layout.
   const insets = useSafeAreaInsets();
 
-  if (!isLoaded) {
-    return null;
-  }
-
-  if (!isSignedIn) {
-    return <Redirect href="/(auth)/sign-in" />;
-  } 
-  
   return (
     <Tabs
       screenOptions={{

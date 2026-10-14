@@ -20,6 +20,10 @@ type Step = "credentials" | "verify";
 const UNSUPPORTED_FACTOR_MESSAGE =
   "This account uses a verification method that isn't available in the app yet.";
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
+const INVALID_CREDENTIALS_MESSAGE = "Incorrect email or password.";
+
+// Shown as one generic message so the form doesn't reveal which emails have accounts.
+const CREDENTIAL_ERROR_CODES = new Set(["form_identifier_not_found", "form_password_incorrect"]);
 
 const SignIn = () => {
   const { signIn, errors, fetchStatus } = useSignIn();
@@ -40,20 +44,30 @@ const SignIn = () => {
 
   const serverError = <T,>(value: T) => (showServerErrors ? value : undefined);
 
+  const isCredentialError =
+    CREDENTIAL_ERROR_CODES.has(errors.fields.identifier?.code ?? "") ||
+    CREDENTIAL_ERROR_CODES.has(errors.fields.password?.code ?? "");
+
   const emailError =
     (submitted ? validateEmail(email) : undefined) ??
-    serverError(getErrorMessage(errors.fields.identifier));
+    serverError(isCredentialError ? undefined : getErrorMessage(errors.fields.identifier));
   const passwordError =
     (submitted ? validatePassword(password) : undefined) ??
-    serverError(getErrorMessage(errors.fields.password));
+    serverError(isCredentialError ? undefined : getErrorMessage(errors.fields.password));
   const codeError =
     (codeSubmitted ? validateCode(code) : undefined) ??
     serverError(getErrorMessage(errors.fields.code));
-  const hasFieldError = !!(errors.fields.identifier || errors.fields.password);
+  const hasFieldError = !!(
+    errors.fields.identifier ||
+    errors.fields.password ||
+    errors.fields.code
+  );
   const bannerError =
     formError ??
     serverError(
-      getErrorMessage(errors.global?.[0]) ?? (hasFieldError ? undefined : requestError),
+      (isCredentialError ? INVALID_CREDENTIALS_MESSAGE : undefined) ??
+        getErrorMessage(errors.global?.[0]) ??
+        (hasFieldError ? undefined : requestError),
     );
 
   const clearFeedback = () => {
@@ -121,7 +135,10 @@ const SignIn = () => {
 
     const { error } = await signIn.mfa.verifyEmailCode({ code });
     setShowServerErrors(true);
-    if (error) return;
+    if (error) {
+      setRequestError(error.longMessage ?? GENERIC_ERROR_MESSAGE);
+      return;
+    }
 
     if (signIn.status === "complete") {
       await signIn.finalize({ navigate: redirect });

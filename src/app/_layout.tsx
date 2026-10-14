@@ -21,13 +21,14 @@ const RootNavigator = ({ fontsLoaded }: { fontsLoaded: boolean }) => {
   const { isLoaded, isSignedIn } = useAuth();
   const isReady = fontsLoaded && isLoaded;
 
+  // Wait for the session too, so signed-in users never see the sign-in screen flash.
   useEffect(() => {
-    if (fontsLoaded) {
+    if (isReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [isReady]);
 
-  if (!fontsLoaded) return null;
+  if (!isReady) return null;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -44,12 +45,14 @@ const RootNavigator = ({ fontsLoaded }: { fontsLoaded: boolean }) => {
 };
 
 export default function RootLayout() {
-    const [fontsLoaded] = useFonts({
-    "sans-regular: required": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "sans-medium: required": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "sans-semibold: required": require("../../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
-    "sans-bold: required": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
-    "sans-extrabold: required": require("../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
+  // Keys must match the --font-* families in global.css.
+  const [fontsLoaded] = useFonts({
+    "sans-light": require("../../assets/fonts/PlusJakartaSans-Light.ttf"),
+    "sans-regular": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
+    "sans-medium": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
+    "sans-semibold": require("../../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
+    "sans-bold": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
+    "sans-extrabold": require("../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
   });
 
   return (

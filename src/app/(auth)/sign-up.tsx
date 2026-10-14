@@ -50,7 +50,11 @@ const SignUp = () => {
   const codeError =
     (codeSubmitted ? validateCode(code) : undefined) ??
     serverError(getErrorMessage(errors.fields.code));
-  const hasFieldError = !!(errors.fields.emailAddress || errors.fields.password);
+  const hasFieldError = !!(
+    errors.fields.emailAddress ||
+    errors.fields.password ||
+    errors.fields.code
+  );
   const bannerError =
     formError ??
     serverError(
@@ -104,7 +108,10 @@ const SignUp = () => {
 
     const { error } = await signUp.verifications.verifyEmailCode({ code });
     setShowServerErrors(true);
-    if (error) return;
+    if (error) {
+      setRequestError(error.longMessage ?? GENERIC_ERROR_MESSAGE);
+      return;
+    }
 
     if (signUp.status === "complete") {
       await signUp.finalize({ navigate: redirect });
