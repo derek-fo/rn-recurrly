@@ -14,6 +14,7 @@ import {
   validateEmail,
   validatePassword,
 } from "../../../lib/validation";
+import { posthog } from "../../lib/posthog";
 
 type Step = "credentials" | "verify";
 
@@ -70,6 +71,10 @@ const SignIn = () => {
         (hasFieldError ? undefined : requestError),
     );
 
+  const trackFailure = (errorCode?: string) => {
+    posthog?.capture("user_sign_in_failed", { step, error_code: errorCode ?? "unknown" });
+  };
+
   const clearFeedback = () => {
     setShowServerErrors(false);
     setFormError(undefined);
@@ -95,11 +100,13 @@ const SignIn = () => {
     setShowServerErrors(true);
 
     if (error) {
+      trackFailure(error.code);
       setRequestError(error.longMessage ?? GENERIC_ERROR_MESSAGE);
       return;
     }
 
     if (signIn.status === "complete") {
+      posthog?.capture("user_signed_in", { two_step: step === "verify" });
       await signIn.finalize({ navigate: redirect });
       return;
     }
@@ -136,11 +143,13 @@ const SignIn = () => {
     const { error } = await signIn.mfa.verifyEmailCode({ code });
     setShowServerErrors(true);
     if (error) {
+      trackFailure(error.code);
       setRequestError(error.longMessage ?? GENERIC_ERROR_MESSAGE);
       return;
     }
 
     if (signIn.status === "complete") {
+      posthog?.capture("user_signed_in", { two_step: step === "verify" });
       await signIn.finalize({ navigate: redirect });
     } else {
       setFormError(GENERIC_ERROR_MESSAGE);

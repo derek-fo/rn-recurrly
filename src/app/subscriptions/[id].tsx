@@ -1,8 +1,15 @@
 import { View, Text } from 'react-native'
 import { Link, useLocalSearchParams } from 'expo-router'
+import { useEffect } from 'react'
+import { posthog } from '../../lib/posthog'
 
 const SubscriptionDetails = () => {
     const { id } = useLocalSearchParams<{id: string}>()
+
+    useEffect(() => {
+      if (id) posthog?.capture('subscription_details_viewed', { subscription_id: id })
+    }, [id])
+
   return (
     <View>
       <Text>Subscription Details: {id} </Text>

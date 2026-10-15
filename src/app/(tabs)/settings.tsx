@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, Image } from "react-native";
 import { styled } from "nativewind";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { useClerk, useUser } from "@clerk/expo";
 import clsx from "clsx";
+import dayjs from "dayjs";
+import images from "../../../constants/images";
 import { colors } from "../../../constants/theme";
 import { posthog } from "../../lib/posthog";
 import { posthogLogs } from "../../lib/posthog-logs";
@@ -32,17 +34,48 @@ const Settings = () => {
     }
   };
 
+  const email = user?.primaryEmailAddress?.emailAddress;
+  const displayName = user?.fullName ?? user?.firstName ?? email?.split("@")[0] ?? "User";
+
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
       <Text className="list-title my-5">Settings</Text>
 
+      <View className="sub-card bg-card mb-5">
+        <View className="flex-row items-center gap-4">
+          <Image
+            source={user?.imageUrl ? { uri: user.imageUrl } : images.avatar}
+            className="size-16 rounded-full"
+          />
+          <View className="flex-1">
+            <Text className="sub-title" numberOfLines={1}>
+              {displayName}
+            </Text>
+            {email && (
+              <Text className="sub-meta" numberOfLines={1} ellipsizeMode="tail">
+                {email}
+              </Text>
+            )}
+          </View>
+        </View>
+      </View>
+
       <View className="sub-card bg-card">
+        <Text className="sub-title mb-3">Account</Text>
         <View className="sub-details">
           <View className="sub-row">
             <View className="sub-row-copy">
-              <Text className="sub-label">Signed in as</Text>
-              <Text className="sub-value" numberOfLines={1} ellipsizeMode="tail">
-                {user?.primaryEmailAddress?.emailAddress ?? "Not provided"}
+              <Text className="sub-label">Account ID</Text>
+              <Text className="sub-value" numberOfLines={1} ellipsizeMode="middle">
+                {user?.id ?? "Not provided"}
+              </Text>
+            </View>
+          </View>
+          <View className="sub-row">
+            <View className="sub-row-copy">
+              <Text className="sub-label">Joined</Text>
+              <Text className="sub-value" numberOfLines={1}>
+                {user?.createdAt ? dayjs(user.createdAt).format("DD/MM/YYYY") : "Not provided"}
               </Text>
             </View>
           </View>

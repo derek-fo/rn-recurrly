@@ -15,6 +15,7 @@ import {
   validateEmail,
   validatePassword,
 } from "../../../lib/validation";
+import { posthog } from "../../lib/posthog";
 
 type Step = "details" | "verify";
 
@@ -63,6 +64,10 @@ const SignUp = () => {
         (hasFieldError ? undefined : requestError),
     );
 
+  const trackFailure = (errorCode?: string) => {
+    posthog?.capture("user_sign_up_failed", { step, error_code: errorCode ?? "unknown" });
+  };
+
   const clearFeedback = () => {
     setShowServerErrors(false);
     setFormError(undefined);
@@ -88,6 +93,7 @@ const SignUp = () => {
     setShowServerErrors(true);
 
     if (error) {
+      trackFailure(error.code);
       setRequestError(error.longMessage ?? GENERIC_ERROR_MESSAGE);
       return;
     }
@@ -109,11 +115,13 @@ const SignUp = () => {
     const { error } = await signUp.verifications.verifyEmailCode({ code });
     setShowServerErrors(true);
     if (error) {
+      trackFailure(error.code);
       setRequestError(error.longMessage ?? GENERIC_ERROR_MESSAGE);
       return;
     }
 
     if (signUp.status === "complete") {
+      posthog?.capture("user_signed_up");
       await signUp.finalize({ navigate: redirect });
     } else {
       setFormError(INCOMPLETE_SIGN_UP_MESSAGE);

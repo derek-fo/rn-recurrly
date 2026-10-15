@@ -1,4 +1,4 @@
-import { SplashScreen, Stack } from "expo-router";
+import { SplashScreen, Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import "../../global.css";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
@@ -28,6 +28,30 @@ const AUTH_LOAD_TIMEOUT_MS = 8000;
 // Lets native apps start from cached session data when offline (uses SecureStore, so not on web).
 const nativeResourceCache = Platform.OS === "web" ? undefined : resourceCache;
 
+// Only these route params are sent with screen events, so nothing sensitive leaks.
+const TRACKED_SCREEN_PARAMS = ["id"];
+
+// Manual screen tracking: PostHog's automatic screen capture needs React Navigation's
+// container, which expo-router manages internally.
+const useScreenTracking = () => {
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+  const previousPathname = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (previousPathname.current === pathname) return;
+
+    const trackedParams = Object.fromEntries(
+      Object.entries(params).filter(([key]) => TRACKED_SCREEN_PARAMS.includes(key)),
+    );
+    posthog?.screen(pathname, {
+      previous_screen: previousPathname.current ?? null,
+      ...trackedParams,
+    });
+    previousPathname.current = pathname;
+  }, [pathname, params]);
+};
+
 const ConnectingScreen = () => (
   <View className="auth-screen items-center justify-center gap-4 px-5">
     <ActivityIndicator color={colors.accent} size="large" />
@@ -45,6 +69,8 @@ const RootNavigator = ({ fontsReady }: { fontsReady: boolean }) => {
   const identifiedUserId = useRef<string | undefined>(undefined);
   const [authTimedOut, setAuthTimedOut] = useState(false);
   const isReady = fontsReady && isLoaded;
+
+  useScreenTracking();
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -118,7 +144,10 @@ export default function RootLayout() {
       __experimental_resourceCache={nativeResourceCache}
     >
       {posthog ? (
-        <PostHogProvider client={posthog}>
+        <PostHogProvider
+          client={posthog}
+          autocapture={{ captureScreens: false, captureTouches: true, propsToCapture: ["testID"] }}
+        >
           <RootNavigator fontsReady={fontsReady} />
         </PostHogProvider>
       ) : (
