@@ -218,7 +218,7 @@ const SignUp = () => {
         <AuthButton title="Create account" onPress={handleSubmit} loading={isFetching} />
 
         <Text className="auth-helper text-center">
-          We'll email you a code to confirm it's really you.
+          We&apos;ll email you a code to confirm it&apos;s really you.
         </Text>
       </View>
 

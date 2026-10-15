@@ -83,7 +83,7 @@ const RootNavigator = ({ fontsReady }: { fontsReady: boolean }) => {
     if (isSignedIn && user?.id && identifiedUserId.current !== user.id) {
       posthog?.identify(user.id, {
         $set: {
-          email: user.primaryEmailAddress?.emailAddress,
+          email: user.primaryEmailAddress?.emailAddress ?? null,
           first_name: user.firstName,
           last_name: user.lastName,
         },

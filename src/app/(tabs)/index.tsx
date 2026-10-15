@@ -1,6 +1,5 @@
 import "../../../global.css";
 import { Text, Image, View, FlatList, Pressable } from "react-native";
-import { Link } from "expo-router";
 import { styled } from "nativewind";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { HOME_BALANCE, HOME_USER } from "../../../constants/data";
@@ -142,8 +141,8 @@ export default function App() {
               } else {
                 posthog?.capture("subscription_details_expanded", {
                   subscription_id: item.id,
-                  subscription_category: item.category,
-                  subscription_status: item.status,
+                  subscription_category: item.category ?? null,
+                  subscription_status: item.status ?? null,
                   billing_interval: item.billing,
                 });
                 posthogLogs.subscriptionDetailsExpanded({

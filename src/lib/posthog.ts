@@ -29,6 +29,8 @@ export const posthog = isPostHogConfigured
       logs: {
         serviceName: "rn-recurrly",
       },
-      debug: __DEV__,
     })
   : undefined;
+
+// Verbose SDK logging in development only.
+if (__DEV__) posthog?.debug();

@@ -3,14 +3,14 @@ import { posthog } from "./posthog";
 export const posthogLogs = {
   subscriptionDetailsExpanded: (subscription: {
     id: string;
-    category: string;
-    status: string;
+    category?: string;
+    status?: string;
     billingInterval: string;
   }) => {
     posthog?.logger.info("subscription details expanded", {
       subscription_id: subscription.id,
-      subscription_category: subscription.category,
-      subscription_status: subscription.status,
+      subscription_category: subscription.category ?? null,
+      subscription_status: subscription.status ?? null,
       billing_interval: subscription.billingInterval,
     });
   },
